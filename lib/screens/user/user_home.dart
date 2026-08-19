@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../providers/category_provider.dart';
 import '../../providers/procedure_provider.dart';
 import '../../routes/app_routes.dart';
 
@@ -11,8 +12,9 @@ class UserHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final procedureProvider =
-    context.watch<ProcedureProvider>();
+    final procedureProvider = context.watch<ProcedureProvider>();
+    final categoryProvider = context.watch<CategoryProvider>();
+    final categories = context.watch<CategoryProvider>().categories;
 
     final user = authProvider.currentUser;
     final procedures = procedureProvider.procedures;
@@ -39,9 +41,9 @@ class UserHome extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Greeting
             Text(
               'Good Morning, ${user?.name ?? 'Student'} 👋',
               style: const TextStyle(
@@ -74,19 +76,19 @@ class UserHome extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Search procedures...',
-                    prefixIcon:
-                    const Icon(Icons.search),
-                    suffixIcon:
-                    const Icon(Icons.arrow_forward),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: const Icon(Icons.arrow_forward),
                     border: OutlineInputBorder(
-                      borderRadius:
-                      BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
               ),
             ),
 
+            const SizedBox(height: 15),
+
+            // Favorites
             Card(
               child: ListTile(
                 leading: const CircleAvatar(
@@ -95,23 +97,19 @@ class UserHome extends StatelessWidget {
                     color: Colors.red,
                   ),
                 ),
-
                 title: const Text(
                   'My Favorites',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 subtitle: const Text(
                   'View your saved procedures',
                 ),
-
                 trailing: const Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
                 ),
-
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -123,10 +121,9 @@ class UserHome extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // Procedures
+            // Popular Procedures
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'Popular Procedures',
@@ -169,42 +166,33 @@ class UserHome extends StatelessWidget {
               ...procedures.take(5).map(
                     (procedure) {
                   return Card(
-                    margin:
-                    const EdgeInsets.only(
+                    margin: const EdgeInsets.only(
                       bottom: 12,
                     ),
                     child: ListTile(
                       leading: CircleAvatar(
                         child: Text(
-                          procedure.title[0]
-                              .toUpperCase(),
+                          procedure.title[0].toUpperCase(),
                         ),
                       ),
-
                       title: Text(
                         procedure.title,
-                        style:
-                        const TextStyle(
-                          fontWeight:
-                          FontWeight.bold,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       subtitle: Text(
                         '${procedure.categoryName} • '
                             '${procedure.processingTime}',
                       ),
-
                       trailing: const Icon(
                         Icons.arrow_forward_ios,
                         size: 16,
                       ),
-
                       onTap: () {
                         Navigator.pushNamed(
                           context,
-                          AppRoutes
-                              .procedureDetails,
+                          AppRoutes.procedureDetails,
                           arguments: procedure,
                         );
                       },
@@ -215,53 +203,67 @@ class UserHome extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            const Text(
-              'Categories',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            // Categories
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Categories',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                if (categories.isNotEmpty)
+                  Text(
+                    '${categories.length}',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
+                  ),
+              ],
             ),
 
             const SizedBox(height: 15),
 
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics:
-              const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.5,
+            // Dynamic categories
+            if (categories.isEmpty)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Center(
+                    child: Text(
+                      'No categories available yet.',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.5,
+                ),
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
 
-              children: const [
-                _CategoryCard(
-                  icon: Icons.school_outlined,
-                  title: 'Academic',
-                ),
-                _CategoryCard(
-                  icon: Icons.assignment_outlined,
-                  title: 'Examination',
-                ),
-                _CategoryCard(
-                  icon: Icons
-                      .account_balance_wallet_outlined,
-                  title: 'Finance',
-                ),
-                _CategoryCard(
-                  icon: Icons.home_outlined,
-                  title: 'Hostel',
-                ),
-                _CategoryCard(
-                  icon: Icons.menu_book_outlined,
-                  title: 'Library',
-                ),
-                _CategoryCard(
-                  icon: Icons.badge_outlined,
-                  title: 'Certificates',
-                ),
-              ],
-            ),
+                  return _CategoryCard(
+                    title: category.name,
+                    description: category.description,
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -270,36 +272,54 @@ class UserHome extends StatelessWidget {
 }
 
 class _CategoryCard extends StatelessWidget {
-  final IconData icon;
   final String title;
+  final String description;
 
   const _CategoryCard({
-    required this.icon,
     required this.title,
+    required this.description,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        mainAxisAlignment:
-        MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 32,
-            color: Colors.indigo,
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.category_outlined,
+              size: 32,
+              color: Colors.indigo,
             ),
-          ),
-        ],
+
+            const SizedBox(height: 8),
+
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 4),
+
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

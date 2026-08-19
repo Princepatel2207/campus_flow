@@ -166,7 +166,9 @@ class CategoryManagementScreen extends StatelessWidget {
                   maxLines: 3,
                   decoration: const InputDecoration(
                     labelText: 'Description',
-                    hintText: 'Enter category description',
+                    hintText:
+                    'Describe this category',
+                    alignLabelWithHint: true,
                   ),
                 ),
               ],

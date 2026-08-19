@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../../providers/category_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../routes/app_routes.dart';
-
+import 'category_management_screen.dart';
 class AdminDashboard extends StatelessWidget {
 const AdminDashboard({super.key});
 
 @override
 Widget build(BuildContext context) {
-final authProvider = context.watch<AuthProvider>();
+    final categoryProvider = context.watch<CategoryProvider>();
+    final authProvider = context.watch<AuthProvider>();
     final user = authProvider.currentUser;
 
     return Scaffold(
@@ -39,7 +40,7 @@ final authProvider = context.watch<AuthProvider>();
     children: [
 
     Text(
-    'Welcome, ${user?.name ?? 'Admin'} 👋',
+    'Welcome, ${user?.name ?? 'Admin'} ',
     style: const TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ final authProvider = context.watch<AuthProvider>();
     child: _dashboardCard(
     icon: Icons.business_outlined,
     title: 'Offices',
-    value: '0',
+    value: categoryProvider.categories.length.toString(),
     onTap: () {},
     ),
     ),

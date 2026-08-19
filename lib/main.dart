@@ -39,9 +39,7 @@ class CampusCompassApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
       title: 'CampusCompass',
-
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -51,7 +49,6 @@ class CampusCompassApp extends StatelessWidget {
       ),
 
       initialRoute: AppRoutes.login,
-
       routes: AppRoutes.routes,
     );
   }
