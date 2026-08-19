@@ -308,6 +308,8 @@ class _CategoryCard extends StatelessWidget {
 
             const SizedBox(height: 4),
 
+
+
             Text(
               description,
               textAlign: TextAlign.center,
